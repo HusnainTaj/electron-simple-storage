@@ -1,7 +1,7 @@
 {
 	"name": "electron-simple-storage",
-	"version": "0.0.2",
-	"description": "[WIP] Library to store data in json files for Electron apps",
+	"version": "0.0.3",
+	"description": "Simple JSON file storage for Electron apps",
 	"keywords": [],
 	"author": "Husnain Taj <husnain.taj@gmail.com>",
 	"license": "MIT",

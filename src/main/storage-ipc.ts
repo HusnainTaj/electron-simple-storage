@@ -3,7 +3,7 @@ import { Store } from '.';
 
 export function setupStorageIPC(ipcMain: Electron.IpcMain)
 {
-    // Using any type for StoreConfig here for generic compatibility.
+    // Using "any" type for StoreConfig here for generic compatibility.
     // It is the job of preload to ensure the correct type is used.
 
     ipcMain.handle('electron-simple-storage:get', async (_: any, config: StoreConfig<any>) =>
