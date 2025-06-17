@@ -6,7 +6,7 @@ export function setupStorageIPC(ipcMain: Electron.IpcMain)
     // Using any type for StoreConfig here for generic compatibility.
     // It is the job of preload to ensure the correct type is used.
 
-    ipcMain.handle('store:get', async (_: any, config: StoreConfig<any>) =>
+    ipcMain.handle('electron-simple-storage:get', async (_: any, config: StoreConfig<any>) =>
     {
         try
         {
@@ -20,7 +20,7 @@ export function setupStorageIPC(ipcMain: Electron.IpcMain)
         }
     });
 
-    ipcMain.handle('store:set', async (_, config: StoreConfig<any>, value: any) =>
+    ipcMain.handle('electron-simple-storage:set', async (_, config: StoreConfig<any>, value: any) =>
     {
         try
         {
@@ -34,7 +34,7 @@ export function setupStorageIPC(ipcMain: Electron.IpcMain)
         }
     });
 
-    ipcMain.handle('store:delete', async (_, config: StoreConfig<any>) =>
+    ipcMain.handle('electron-simple-storage:delete', async (_, config: StoreConfig<any>) =>
     {
         try
         {
@@ -48,7 +48,7 @@ export function setupStorageIPC(ipcMain: Electron.IpcMain)
         }
     });
 
-    ipcMain.handle('store:clear', async (_, config: StoreConfig<any>) =>
+    ipcMain.handle('electron-simple-storage:clear', async (_, config: StoreConfig<any>) =>
     {
         try
         {

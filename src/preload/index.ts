@@ -1,23 +1,23 @@
-import { StoreConfig } from "../types";
+import { RendererStore, StoreConfig } from "../types";
 
-export function setupRendererStore<T>(ipcRenderer: Electron.IpcRenderer, config: StoreConfig<T>)
+export function setupRendererStore<T>(ipcRenderer: Electron.IpcRenderer, config: StoreConfig<T>): RendererStore<T>
 {
     return {
         get: async (): Promise<T> =>
         {
-            return await ipcRenderer.invoke('store:get', config) as T;
+            return await ipcRenderer.invoke('electron-simple-storage:get', config) as T;
         },
         set: async (value: T): Promise<void> =>
         {
-            await ipcRenderer.invoke('store:set', config, value);
+            await ipcRenderer.invoke('electron-simple-storage:set', config, value);
         },
         delete: async (): Promise<void> =>
         {
-            await ipcRenderer.invoke('store:delete', config);
+            await ipcRenderer.invoke('electron-simple-storage:delete', config);
         },
         clear: async (): Promise<void> =>
         {
-            await ipcRenderer.invoke('store:clear', config);
+            await ipcRenderer.invoke('electron-simple-storage:clear', config);
         },
         watch: (callback: (value: T) => void) =>
         {
@@ -30,11 +30,11 @@ export function setupRendererStore<T>(ipcRenderer: Electron.IpcRenderer, config:
                 }
             };
 
-            const a = ipcRenderer.on('store:changed', listener);
+            const a = ipcRenderer.on('electron-simple-storage:changed', listener);
 
             return () =>
             {
-                a.off('store:changed', listener);
+                a.off('electron-simple-storage:changed', listener);
             };
         }
     }

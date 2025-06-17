@@ -1,12 +1,9 @@
-import { join } from "node:path";
-import * as fs from "node:fs";
+import { join } from "path";
+import * as fs from "fs";
 import { app, BrowserWindow } from "electron";
 import { StoreConfig } from "../types";
 
-
-// https://github.com/typicode/lowdb // maybe replace with this
-// a file that stores data in a json file using fs module and provides methods to get, set, and delete data
-// its constructor takes a file name and uses default electron app data path
+// https://github.com/typicode/lowdb // maybe use with this
 export class Store<T>
 {
     private filePath: string;
@@ -34,7 +31,7 @@ export class Store<T>
 
         for (const window of BrowserWindow.getAllWindows())
         {
-            window.webContents.send('store:changed', this.config.filename, this.config.key, value);
+            window.webContents.send('electron-simple-storage:changed', this.config.filename, this.config.key, value);
         }
     }
 

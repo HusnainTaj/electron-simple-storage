@@ -1,6 +1,6 @@
 {
 	"name": "electron-simple-storage",
-	"version": "0.0.1",
+	"version": "0.0.2",
 	"description": "[WIP] Library to store data in json files for Electron apps",
 	"keywords": [],
 	"author": "Husnain Taj <husnain.taj@gmail.com>",
@@ -39,7 +39,7 @@
 		"typescript": ">=3.0.0"
 	},
 	"peerDependencies": {
-		"electron": "^36.4.0"
+		"electron": "^30.0.0"
 	},
 	"pnpm": {
 		"onlyBuiltDependencies": [
