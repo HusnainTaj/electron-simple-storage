@@ -2,8 +2,6 @@
 
 A simple storage solution for Electron apps, using JSON files to store data.
 
-`NOT READY FOR PRODUCTION, YET!`
-
 ## Features
 
 -   Basic CRUD operations
