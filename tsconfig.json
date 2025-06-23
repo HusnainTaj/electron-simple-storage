@@ -1,0 +1,26 @@
+{
+    "compilerOptions": {
+        "outDir": "dist",
+        "rootDir": "src",
+        "declaration": true,
+        "removeComments": true,
+        "module": "ESNext",
+        "target": "ES2020",
+        "moduleResolution": "Node",
+        "esModuleInterop": true,
+        "strict": true,
+        "skipLibCheck": true,
+        "baseUrl": "src",
+        "paths": {
+            "ess/main": [
+                "main"
+            ],
+            "ess/preload": [
+                "preload"
+            ]
+        }
+    },
+    "include": [
+        "src"
+    ]
+}

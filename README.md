@@ -74,7 +74,7 @@ app.whenReady().then(() => setupStorageIPC(ipcMain));
 ```typescript
 // in your preload script (e.g., preload.ts)
 import { contextBridge, ipcRenderer } from "electron";
-import { setupRendererStore } from "electron-simple-storage";
+import { setupRendererStore } from "~/node_modules/ess/dist/preload"; // must be imported directly
 import { StoreConfigs } from "path/to/stores.ts"; // update with your actual path to file where stores were defined in step 1
 
 declare global {

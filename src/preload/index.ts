@@ -1,6 +1,15 @@
-import { RendererStore, StoreConfig } from "../types";
+import type { IpcRenderer } from "electron/renderer";
+import { StoreConfig } from "../main";
 
-export function setupRendererStore<T>(ipcRenderer: Electron.IpcRenderer, config: StoreConfig<T>): RendererStore<T>
+export type RendererStore<T> = {
+    get: () => Promise<T>;
+    set: (value: T) => Promise<void>;
+    delete: () => Promise<void>;
+    clear: () => Promise<void>;
+    watch: (callback: (value: T) => void) => () => void;
+};
+
+export function setupRendererStore<T>(ipcRenderer: IpcRenderer, config: StoreConfig<T>): RendererStore<T>
 {
     return {
         get: async (): Promise<T> =>
