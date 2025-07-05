@@ -2,6 +2,7 @@ import type { IpcRenderer } from "electron/renderer";
 import { StoreConfig } from "../main";
 
 export type RendererStore<T> = {
+    fallback: T;
     get: () => Promise<T>;
     set: (value: T) => Promise<void>;
     update: (updater: (value: T) => T) => Promise<void>;
@@ -12,6 +13,7 @@ export type RendererStore<T> = {
 export function setupRendererStore<T>(ipcRenderer: IpcRenderer, config: StoreConfig<T>): RendererStore<T>
 {
     return {
+        fallback: config.fallback,
         get: async (): Promise<T> =>
         {
             return await ipcRenderer.invoke('electron-simple-storage:get', config) as T;

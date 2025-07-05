@@ -1,6 +1,6 @@
 {
 	"name": "electron-simple-storage",
-	"version": "0.0.5",
+	"version": "0.0.6",
 	"description": "Simple JSON file storage for Electron apps",
 	"keywords": [
 		"electron",
