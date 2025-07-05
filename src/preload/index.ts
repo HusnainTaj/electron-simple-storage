@@ -4,8 +4,8 @@ import { StoreConfig } from "../main";
 export type RendererStore<T> = {
     fallback: T;
     get: () => Promise<T>;
-    set: (value: T) => Promise<void>;
-    update: (updater: (value: T) => T) => Promise<void>;
+    set: (value: T, notify?: boolean) => Promise<void>;
+    update: (updater: (value: T) => T, notify?: boolean) => Promise<void>;
     delete: () => Promise<void>;
     watch: (callback: (value: T) => void) => () => void;
 };
