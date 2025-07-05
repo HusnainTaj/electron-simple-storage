@@ -12,6 +12,13 @@ export type StoreConfig<T> = {
 export class Store<T>
 {
     private filePath: string;
+
+    // Read data once and store it in memory, only update when a change is made
+    // this allows us to avoid reading from file every time we need to get data
+    // But this also means the data could be stale if some other process modifies the file directly
+    // i.e. this only works for single process applications
+    private data: any = undefined;
+
     constructor(private config: StoreConfig<T>)
     {
         this.filePath = join(app.getPath("userData"), `${this.config.filename}.json`);
@@ -22,34 +29,67 @@ export class Store<T>
         }
     }
 
-    get(): T
+    private loadData(): void
     {
-        const data = JSON.parse(fs.readFileSync(this.filePath, "utf-8"));
-        return data[this.config.key] !== undefined ? data[this.config.key] : this.config.fallback;
+        if (this.data === undefined)
+        {
+            try
+            {
+                this.data = JSON.parse(fs.readFileSync(this.filePath, "utf-8"));
+            }
+            catch (error)
+            {
+                console.error(`Error reading or parsing file ${this.filePath}:`, error);
+                this.data = {};
+            }
+        }
     }
 
-    set(value: T): void
+    private saveData(): void
     {
-        const data = JSON.parse(fs.readFileSync(this.filePath, "utf-8"));
-        data[this.config.key] = value;
-        fs.writeFileSync(this.filePath, JSON.stringify(data, null, 2));
-
-        for (const window of BrowserWindow.getAllWindows())
+        try
         {
-            window.webContents.send('electron-simple-storage:changed', this.config.filename, this.config.key, value);
+            fs.writeFileSync(this.filePath, JSON.stringify(this.data || {}, null, 2));
+        } catch (error)
+        {
+            console.error(`Error writing to file ${this.filePath}:`, error);
+            throw error; // rethrow to handle it in the IPC handler
         }
+    }
+
+    get(): T
+    {
+        this.loadData();
+        return this.data[this.config.key] !== undefined ? this.data[this.config.key] : this.config.fallback;
+    }
+
+    set(value: T, notify = true): void
+    {
+        this.loadData();
+        this.data[this.config.key] = value;
+        this.saveData();
+
+        if (notify)
+        {
+            for (const window of BrowserWindow.getAllWindows())
+            {
+                window.webContents.send('electron-simple-storage:changed', this.config.filename, this.config.key, value);
+            }
+        }
+    }
+
+    update(updater: (value: T) => T): void
+    {
+        const currentValue = this.get();
+        const newValue = updater(currentValue);
+        this.set(newValue);
     }
 
     delete(): void
     {
-        const data = JSON.parse(fs.readFileSync(this.filePath, "utf-8"));
-        delete data[this.config.key];
-        fs.writeFileSync(this.filePath, JSON.stringify(data, null, 2));
-    }
-
-    clear(): void
-    {
-        fs.writeFileSync(this.filePath, JSON.stringify({}));
+        this.loadData();
+        delete this.data[this.config.key];
+        this.saveData();
     }
 }
 
@@ -96,20 +136,6 @@ export function setupStorageIPC(ipcMain: Electron.IpcMain)
         } catch (error)
         {
             console.error('Error deleting storage item:', error)
-            throw error
-        }
-    });
-
-    ipcMain.handle('electron-simple-storage:clear', async (_, config: StoreConfig<any>) =>
-    {
-        try
-        {
-            const store = new Store(config);
-            store.clear();
-            return true;
-        } catch (error)
-        {
-            console.error('Error clearing storage item:', error)
             throw error
         }
     });

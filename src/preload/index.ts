@@ -4,8 +4,8 @@ import { StoreConfig } from "../main";
 export type RendererStore<T> = {
     get: () => Promise<T>;
     set: (value: T) => Promise<void>;
+    update: (updater: (value: T) => T) => Promise<void>;
     delete: () => Promise<void>;
-    clear: () => Promise<void>;
     watch: (callback: (value: T) => void) => () => void;
 };
 
@@ -16,17 +16,19 @@ export function setupRendererStore<T>(ipcRenderer: IpcRenderer, config: StoreCon
         {
             return await ipcRenderer.invoke('electron-simple-storage:get', config) as T;
         },
-        set: async (value: T): Promise<void> =>
+        set: async (value: T, notify = true): Promise<void> =>
         {
-            await ipcRenderer.invoke('electron-simple-storage:set', config, value);
+            await ipcRenderer.invoke('electron-simple-storage:set', config, value, notify);
+        },
+        update: async (updater: (value: T) => T, notify = true): Promise<void> =>
+        {
+            const currentValue = await ipcRenderer.invoke('electron-simple-storage:get', config) as T;
+            const newValue = updater(currentValue);
+            await ipcRenderer.invoke('electron-simple-storage:set', config, newValue, notify);
         },
         delete: async (): Promise<void> =>
         {
             await ipcRenderer.invoke('electron-simple-storage:delete', config);
-        },
-        clear: async (): Promise<void> =>
-        {
-            await ipcRenderer.invoke('electron-simple-storage:clear', config);
         },
         watch: (callback: (value: T) => void) =>
         {

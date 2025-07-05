@@ -1,6 +1,6 @@
 # electron-simple-storage
 
-A simple storage solution for Electron apps, using JSON files to store data.
+A simple reactive storage solution for Electron apps, using JSON files to store data.
 
 ## Features
 
@@ -8,6 +8,7 @@ A simple storage solution for Electron apps, using JSON files to store data.
 -   Data is stored in a JSON file
 -   Works with both Electron's main and renderer processes
 -   Supports watching for changes (made in main or renderer) in renderer processes
+-   No need for enabling `nodeIntegration` in the window
 
 ## Installation
 
@@ -72,7 +73,7 @@ app.whenReady().then(() => setupStorageIPC(ipcMain));
 ```typescript
 // in your preload script (e.g., preload.ts)
 import { contextBridge, ipcRenderer } from "electron";
-import { setupRendererStore } from "~/node_modules/ess/dist/preload"; // must be imported directly
+import { setupRendererStore } from "~/node_modules/electron-simple-storage/dist/preload"; // must be imported directly
 import { StoreConfigs } from "path/to/stores.ts"; // update with your actual path to file where stores were defined in step 1
 
 declare global {
