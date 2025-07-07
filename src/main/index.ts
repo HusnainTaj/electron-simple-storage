@@ -3,7 +3,7 @@ import * as fs from "node:fs";
 import { app, BrowserWindow } from "electron";
 
 export type StoreConfig<T> = {
-    filename: string;
+    filename: ":memory:" | (string & {}); // hacky way to get ":memory:" in intellisense
     key: string;
     fallback: T;
 };
@@ -11,7 +11,7 @@ export type StoreConfig<T> = {
 // https://github.com/typicode/lowdb // maybe use with this
 export class Store<T>
 {
-    private filePath: string;
+    private filePath: string | ":memory:";
 
     // Read data once and store it in memory, only update when a change is made
     // this allows us to avoid reading from file every time we need to get data
@@ -21,11 +21,20 @@ export class Store<T>
 
     constructor(private config: StoreConfig<T>)
     {
-        this.filePath = join(app.getPath("userData"), `${this.config.filename}.json`);
-        fs.mkdirSync(app.getPath("userData"), { recursive: true });
-        if (!fs.existsSync(this.filePath))
+        if (config.filename === ":memory:")
         {
-            fs.writeFileSync(this.filePath, JSON.stringify({}));
+            this.filePath = ":memory:";
+            console.info(`[Store] Creating in-memory store for ${config.key}`);
+            this.data = {}; // initialize in-memory data
+        }
+        else
+        {
+            this.filePath = join(app.getPath("userData"), `${config.filename}.json`);
+            fs.mkdirSync(app.getPath("userData"), { recursive: true });
+            if (!fs.existsSync(this.filePath))
+            {
+                fs.writeFileSync(this.filePath, JSON.stringify({}));
+            }
         }
     }
 
@@ -33,9 +42,16 @@ export class Store<T>
     {
         if (this.data === undefined)
         {
+            if (this.config.filename === ":memory:")
+            {
+                this.data = {};
+                return; // do not read from file if inMemory is true
+            }
+
             try
             {
                 this.data = JSON.parse(fs.readFileSync(this.filePath, "utf-8"));
+                console.log(`[Store] Loaded data from ${this.filePath}`);
             }
             catch (error)
             {
@@ -47,9 +63,12 @@ export class Store<T>
 
     private saveData(): void
     {
+        if (this.config.filename === ":memory:") return; // do not write to file if inMemory is true
+
         try
         {
             fs.writeFileSync(this.filePath, JSON.stringify(this.data || {}, null, 2));
+            console.log(`[Store] Saved data to ${this.filePath}`);
         } catch (error)
         {
             console.error(`Error writing to file ${this.filePath}:`, error);
@@ -78,11 +97,11 @@ export class Store<T>
         }
     }
 
-    update(updater: (value: T) => T): void
+    update(updater: (value: T) => T, notify = true): void
     {
         const currentValue = this.get();
         const newValue = updater(currentValue);
-        this.set(newValue);
+        this.set(newValue, notify);
     }
 
     delete(): void
@@ -112,12 +131,12 @@ export function setupStorageIPC(ipcMain: Electron.IpcMain)
         }
     });
 
-    ipcMain.handle('electron-simple-storage:set', async (_, config: StoreConfig<any>, value: any) =>
+    ipcMain.handle('electron-simple-storage:set', async (_, config: StoreConfig<any>, value: any, notify = true) =>
     {
         try
         {
             const store = new Store(config);
-            store.set(value);
+            store.set(value, notify);
             return true;
         } catch (error)
         {

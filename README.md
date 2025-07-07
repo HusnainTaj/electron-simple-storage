@@ -55,6 +55,14 @@ export const StoreConfigs = {
 		key: "interval",
 		fallback: 1000,
 	} as StoreConfig<number>,
+
+	// Example of in-memory store
+	// This store will not persist data to disk
+	lastRefreshAt: {
+		filename: ":memory:",
+		key: "last-refresh-at",
+		fallback: undefined,
+	} as StoreConfig<string | undefined>,
 };
 ```
 
