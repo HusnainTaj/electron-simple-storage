@@ -6,6 +6,7 @@ A simple reactive storage solution for Electron apps, using JSON files to store 
 
 -   Basic CRUD operations
 -   Data is stored in a JSON file
+-   In-memory storage support
 -   Works with both Electron's main and renderer processes
 -   Supports watching for changes (made in main or renderer) in renderer processes
 -   No need for enabling `nodeIntegration` in the window
