@@ -52,3 +52,12 @@ export function setupRendererStore<T>(ipcRenderer: IpcRenderer, config: StoreCon
         }
     }
 }
+
+export function createStoreConfig<T>(filename: ":memory:" | (string & {}), key: string, fallback: T): StoreConfig<T>
+{
+    return {
+        filename: filename,
+        key: key,
+        fallback: fallback,
+    };
+}

@@ -23,47 +23,28 @@ npm install electron-simple-storage
 
 ```typescript
 // in a shared file (e.g., stores.ts)
-import { StoreConfig } from "electron-simple-storage";
+import { createStoreConfig } from "electron-simple-storage/preload";
 
 // keys of this object are arbitrary identifiers for your stores
 export const StoreConfigs = {
-	"settings:run-at-start": {
-		// the file where this data will be stored, settings.json in this case
-		filename: "settings",
-		// the key in the json file for this data
-		key: "run-at-start",
-		// default initial value, incase this key does not exist in file
-		fallback: true,
-	} as StoreConfig<boolean>, // make sure to specify the type of the value for better type safety
+	"settings:run-at-start": createStoreConfig<boolean>(
+		`settings`, // the file where this data will be stored, settings.json in this case
+		"run-at-start", // the key in the json file for this data
+		true // default initial value, incase this key does not exist in file
+	),
 
 	// Example of multiple values in a single json file
 	// profile.json will contain username and email keys
-	"profile:username": {
-		filename: "profile",
-		key: "username",
-		fallback: "Guest",
-	} as StoreConfig<string>,
-	"profile:email": {
-		filename: "profile",
-		key: "email",
-		fallback: "",
-	} as StoreConfig<string>,
+	"profile:username": createStoreConfig<string>("profile", "username", "Guest"),
+	"profile:email": createStoreConfig<string>("profile", "email", ""),
 
 	// Example of single value in a single json file
 	// interval key in interval.json
-	interval: {
-		filename: "interval",
-		key: "interval",
-		fallback: 1000,
-	} as StoreConfig<number>,
+	interval: createStoreConfig<number>("interval", "interval", 1000),
 
 	// Example of in-memory store
 	// This store will not persist data to disk
-	lastRefreshAt: {
-		filename: ":memory:",
-		key: "last-refresh-at",
-		fallback: undefined,
-	} as StoreConfig<string | undefined>,
+	lastRefreshAt: createStoreConfig<string | undefined>(":memory:", "last-refresh-at", undefined),
 };
 ```
 
